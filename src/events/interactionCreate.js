@@ -1,47 +1,52 @@
-const { MessageFlags } = require('discord.js');
-const logger = require('../utils/logger');
+const { MessageFlags } = require("discord.js");
+const logger = require("../utils/logger");
 
 module.exports = {
-    name: 'interactionCreate',
-    async execute(interaction) {
-        if (!interaction.isChatInputCommand()) return;
+  name: "interactionCreate",
+  async execute(interaction) {
+    if (!interaction.isChatInputCommand()) return;
 
-        const command = interaction.client.commands.get(interaction.commandName);
-        
-        const logContext = {
-            userId: interaction.user.id,
-            userName: interaction.user.tag,
-            guildId: interaction.guildId,
-            commandName: interaction.commandName,
-            options: interaction.options.data.map(opt => `${opt.name}:${opt.value}`).join(', ')
-        };
+    const command = interaction.client.commands.get(interaction.commandName);
 
-        if (!command) {
-            logger.warn(`No command matching ${interaction.commandName} was found.`, logContext);
-            return;
-        }
+    const logContext = {
+      userId: interaction.user.id,
+      userName: interaction.user.tag,
+      guildId: interaction.guildId,
+      commandName: interaction.commandName,
+      options: interaction.options.data
+        .map((opt) => `${opt.name}:${opt.value}`)
+        .join(", "),
+    };
 
-        try {
-            logger.info(`Command executed: ${interaction.commandName}`, logContext);
-            await command.execute(interaction);
-            logger.debug(`Command completed: ${interaction.commandName}`, logContext);
-        } catch (error) {
-            logger.error(`Error executing command: ${interaction.commandName}`, {
-                ...logContext,
-                error: error.stack
-            });
+    if (!command) {
+      logger.warn(
+        `No command matching ${interaction.commandName} was found.`,
+        logContext
+      );
+      return;
+    }
 
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ 
-                    content: 'There was an error while executing this command!', 
-                    flags: MessageFlags.Ephemeral 
-                });
-            } else {
-                await interaction.reply({ 
-                    content: 'There was an error while executing this command!', 
-                    flags: MessageFlags.Ephemeral 
-                });
-            }
-        }
-    },
+    try {
+      logger.info(`Command executed: ${interaction.commandName}`, logContext);
+      await command.execute(interaction);
+      logger.debug(`Command completed: ${interaction.commandName}`, logContext);
+    } catch (error) {
+      logger.error(`Error executing command: ${interaction.commandName}`, {
+        ...logContext,
+        error: error.stack,
+      });
+
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      } else {
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    }
+  },
 };
