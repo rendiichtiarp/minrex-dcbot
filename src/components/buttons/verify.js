@@ -1,12 +1,31 @@
 const { MessageFlags } = require('discord.js');
 const logger = require('../../utils/logger');
+const db = require('../../utils/database');
 
 async function execute(interaction) {
     try {
-        const verifiedRole = process.env.VERIFIED_ROLE_ID;
-        const role = interaction.guild.roles.cache.get(verifiedRole);
+        // Get verification settings from database
+        const settings = await db.verification.getSettings(interaction.guildId);
+        if (!settings) {
+            logger.error(`No verification settings found for guild ${interaction.guildId}`);
+            await interaction.reply({
+                content: 'Verification system is not set up. Please contact an administrator.',
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+
+        const role = interaction.guild.roles.cache.get(settings.role_id);
+        if (!role) {
+            logger.error(`Verification role ${settings.role_id} not found in guild ${interaction.guildId}`);
+            await interaction.reply({
+                content: 'The verification role no longer exists. Please contact an administrator.',
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
         
-        if (!verifiedRole || !role) {
+        if (!role) {
             logger.error('Verified role not found or not configured');
             await interaction.reply({
                 content: 'Verification system is not properly configured. Please contact an administrator.',
@@ -15,13 +34,11 @@ async function execute(interaction) {
             return;
         }
 
-        const member = interaction.member;
-        
-        // Check if user already has the role
-        if (member.roles.cache.has(verifiedRole)) {
+        const member = interaction.member;        // Check if user already has the role
+        if (member.roles.cache.has(settings.role_id)) {
             await interaction.reply({
                 content: `You already have the ${role.name} role!`,
-                flags: MessageFlags.Ephemeral
+                ephemeral: true
             });
             return;
         }
@@ -35,18 +52,16 @@ async function execute(interaction) {
             });
             return;
         }        // Add the verified role
-        await member.roles.add(verifiedRole);
-        
-        await interaction.reply({
-            content: `✅ You have been successfully verified! The ${role.name} role has been added.`,
+        await member.roles.add(settings.role_id);
+          await interaction.reply({
+            content: `You have been successfully verified! The ${role.name} role has been added.`,
             flags: MessageFlags.Ephemeral
         });
 
-        logger.info(`User ${interaction.user.tag} (${interaction.user.id}) has been verified with role ${role.name} (${role.id})`);
+        logger.info(`User ${interaction.user.tag} (${interaction.user.id}) has been verified with role ${role.name} (${role.id}) in guild ${interaction.guildId}`);
     } catch (error) {
         logger.error('Error in verification process:', error);
-        await interaction.reply({
-            content: 'There was an error during verification. Please contact an administrator.',
+        await interaction.reply({            content: 'There was an error during verification. Please contact an administrator.',
             flags: MessageFlags.Ephemeral
         });
     }

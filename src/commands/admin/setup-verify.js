@@ -1,7 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const logger = require('../../utils/logger');
+const db = require('../../utils/database');
 
-module.exports = {    data: new SlashCommandBuilder()
+module.exports = {
+    data: new SlashCommandBuilder()
         .setName('setup-verify')
         .setDescription('Setup the verification system')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
@@ -12,21 +14,21 @@ module.exports = {    data: new SlashCommandBuilder()
         .addRoleOption(option =>
             option.setName('role')
                 .setDescription('The role to give when members verify')
-                .setRequired(true)),    async execute(interaction) {
+                .setRequired(true)),    
+    
+    async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
         const role = interaction.options.getRole('role');
 
         // Validate role hierarchy
         if (role.position >= interaction.guild.members.me.roles.highest.position) {
             await interaction.reply({
-                content: '❌ I cannot assign that role as it is higher than or equal to my highest role. Please move my role above the verification role.',
+                content: 'I cannot assign that role as it is higher than or equal to my highest role. Please move my role above the verification role.',
                 flags: MessageFlags.Ephemeral
             });
             return;
-        }
-
-        // Store the role ID in the process.env for this session
-        process.env.VERIFIED_ROLE_ID = role.id;
+        }        // Store verification settings in database
+        await db.verification.saveSettings(interaction.guildId, channel.id, role.id);
 
         // Create the embed
         const verifyEmbed = new EmbedBuilder()
