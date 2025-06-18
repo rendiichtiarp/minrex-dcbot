@@ -21,7 +21,7 @@ module.exports = {
         if (!target.kickable) {
             return interaction.reply({
                 content: 'I cannot kick this user! They might have a higher role than me.',
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
 
@@ -29,13 +29,13 @@ module.exports = {
             await target.kick(reason);
             await interaction.reply({
                 content: `Successfully kicked ${target.user.tag}\nReason: ${reason}`,
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         } catch (error) {
             console.error(error);
             await interaction.reply({
                 content: 'There was an error while trying to kick the member!',
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
     },
