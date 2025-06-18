@@ -35,7 +35,7 @@ module.exports = {
       const productEmbed = new EmbedBuilder()
         .setTitle(title)
         .setDescription(description)
-        .setColor("#3F0076")
+        .setColor("#9F00FF")
         .setThumbnail(interaction.guild.iconURL())
         .setImage(imageUrl)
         .setFooter({
@@ -50,7 +50,7 @@ module.exports = {
           "- Membuat tiket pemesanan di <#1061147057416572928>\n" +
             "- Melakukan pembayaran ke <#1089861130039595061>"
         )
-        .setColor("#3F0076")
+        .setColor("#9F00FF")
         .setFooter({
           iconURL: interaction.guild.iconURL(),
           text: `${interaction.guild.name} | Informasi`,

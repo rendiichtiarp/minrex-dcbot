@@ -53,7 +53,7 @@ module.exports = {
       .setDescription(
         `Selamat datang di ${interaction.guild.name}! Ketuk tombol di bawah untuk memverifikasi diri Anda dan mendapatkan role ${role}.`
       )
-      .setColor("#3F0076")
+      .setColor("#9F00FF")
       .setThumbnail(interaction.guild.iconURL())
       .setImage(
         "https://cdn.discordapp.com/attachments/1382999797786476737/1383859750311301220/Verifikasi.png?ex=6852f653&is=6851a4d3&hm=617839e4e1524467279d4dacff58445619bd5b3200323060406f59dd3fff4bb1&"

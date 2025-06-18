@@ -35,10 +35,10 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle(title)
         .setDescription(description)
-        .setColor("#3F0076") // Warna ungu default
+        .setColor("#9F00FF") // Warna ungu default
         .setFooter({
           text: `${interaction.guild.name} | ${footerText}`,
-          iconURL: interaction.user.displayAvatarURL(),
+          iconURL: interaction.guild.iconURL(),
         });
 
       // Add image if provided

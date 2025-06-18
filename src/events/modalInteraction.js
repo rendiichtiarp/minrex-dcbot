@@ -20,9 +20,20 @@ for (const file of modalFiles) {
 
 module.exports = {
   name: Events.InteractionCreate,
-  async execute(interaction) {
-    if (!interaction.isModalSubmit()) return; // Get modal ID without any additional parameters
-    const baseModalId = interaction.customId.split("-").slice(0, 2).join("-");
+  async execute(interaction) {    if (!interaction.isModalSubmit()) return; 
+    
+    // Get base modal ID by matching known patterns
+    let baseModalId;
+    const customIdParts = interaction.customId.split("-");
+    
+    // Cek apakah customId mengikuti pola add-product-modal-channelId
+    if (customIdParts.length > 3 && customIdParts.slice(0, 3).join("-") === "add-product-modal") {
+      baseModalId = "add-product-modal";
+    } else {
+      // Default behavior: ambil 2 bagian pertama
+      baseModalId = customIdParts.slice(0, 2).join("-");
+    }
+    
     const modal = modals.get(baseModalId);
 
     if (!modal) {
